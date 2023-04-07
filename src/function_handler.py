@@ -72,7 +72,6 @@ async def run(event, context) -> None:
         tasks = list()
         for group in groups:
             tasks.append(ch_writer.write_messages(client, group, messages_after, deadline))
-            tasks.append(ch_writer.write_participants(client, group, deadline))
         tasks.append(ch_writer.write_groups(groups))
         await asyncio.gather(*tasks)
         _LOGGER.info("Done updating tg stats")

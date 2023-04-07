@@ -30,6 +30,7 @@ resource "yandex_function" "tg_stats" {
     CH_HOST         = var.ch-host
     CH_DB           = var.ch-db-name
     DIALOG_IDS      = var.dialog-ids
+    MESSAGES_AFTER  = var.messages-after
   }
   secrets {
     id                   = data.yandex_lockbox_secret.tg_secret.id
@@ -132,5 +133,9 @@ variable "tg-secret-id" {
 }
 
 variable "ch-secret-id" {
+  type = string
+}
+
+variable "messages-after" {
   type = string
 }
