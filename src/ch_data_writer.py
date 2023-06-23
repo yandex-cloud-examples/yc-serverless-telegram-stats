@@ -69,7 +69,7 @@ class CHDataWriter:
             self.ch_client.insert('groups', data, column_names=['group_id', 'name'])
         _LOGGER.info('Done updating groups table')
 
-    def _flush_messages(self, group_name, data):
+    def flush_messages(self, group_name, data):
         _LOGGER.info(f'Flushing {len(data)} messages of "{group_name}"')
         self.ch_client.insert('messages', data,
                               column_names=['group_id', 'message_id', 'dt', 'user_id', 'message_text', 'is_forwarded',
@@ -155,7 +155,7 @@ class CHDataWriter:
             if len(data) >= 100:
                 await self._flush_topics(client, target_group, topics_set)
                 topics_set = set()
-                self._flush_messages(group_name, data)
+                self.flush_messages(group_name, data)
                 data = list()
                 await self._flush_participants(client, group_id, user_id_to_desc)
                 user_id_to_desc = dict()
@@ -163,7 +163,7 @@ class CHDataWriter:
         if len(topics_set) > 0:
             await self._flush_topics(client, target_group, topics_set)
         if len(data) > 0:
-            self._flush_messages(group_name, data)
+            self.flush_messages(group_name, data)
         if len(user_id_to_desc) > 0:
             await self._flush_participants(client, group_id, user_id_to_desc)
         _LOGGER.info(f'Done processing "{group_name}" messages')

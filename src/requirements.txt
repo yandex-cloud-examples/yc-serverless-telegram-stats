@@ -1,4 +1,4 @@
-Telethon~=1.26.1
-yandexcloud
-clickhouse_connect
-python-json-logger
+Telethon == 1.26.1
+yandexcloud == 0.219.0
+clickhouse_connect == 0.5.24
+python-json-logger == 2.0.7
