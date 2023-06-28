@@ -32,19 +32,19 @@ _Все переменные terraform можно передавать в явн
 3. Выставляем OAuth-токен в переменную окружения `YC_TOKEN`. [Как получить OAuth токен](https://cloud.yandex.ru/docs/iam/concepts/authorization/oauth-token)
 4. Запускаем скрипт с генерацией всех секретов: `python3 secrets/create_secrets.py --yc-folder-id <ID фолдера>`. Теперь api_id, api_hash, сессия telegram, пароль от clickhouse и ключ для вебхука telegram хранятся в секретах lockbox. В явном виде доставать их можно через UI или консольный клиент Yandex Cloud. На этом этапе клиент телеги пытается в ней авторизоваться. Он интерактивно попросит все, что ему нужно - номер телефона (вводить через +7 для рф), код подтверждения, пароль (если настроена 2fa). Доставать секреты можно с помощью скрипта `get_secret_payload.py`
 5. Выставляем id созданных секретов в переменные окружения `TF_VAR_CH_SECRET_ID` и `TF_VAR_TG_SECRET_ID`
-6. Выставляем пароль кликхауса в переменную окружения: `export TF_VAR_CH_PASSWORD=$(python3 secrets/get_lockbox_payload.py --secret-id <CH SECRET ID> --key ch_cluster_password)`
+6. Выставляем пароль кликхауса в переменную окружения: `export TF_VAR_CH_PASSWORD=$(python3 secrets/get_lockbox_payload.py --secret-id $TF_VAR_CH_SECRET_ID --key ch_cluster_password)`
 7. Регистрируем telegram бота по [инструкции](https://core.telegram.org/bots/tutorial)
 8. Помещаем токен бота в переменную окружения `TG_BOT_API_TOKEN`
-9. Выставляем переменную окружения с ключом для вебхука телеграм-бота: `export TG_WEBHOOK_KEY=$(python3 secrets/get_lockbox_payload.py --secret-id <TG SECRET ID> --key tg-webhook-key)` 
+9. Выставляем переменную окружения с ключом для вебхука телеграм-бота: `export TG_WEBHOOK_KEY=$(python3 secrets/get_lockbox_payload.py --secret-id $TF_VAR_TG_SECRET_ID --key tg-webhook-key)` 
 
 # Выбираем чаты
-1. Выбираем группы, для которых хотим собирать статистику. Для этого запускаем скрипт: `python3 src/list_groups.py --tg-secret-id <TG SECRET ID>` (ID секрета telegram используем с предыдущих шагов)
+1. Выбираем группы, для которых хотим собирать статистику. Для этого запускаем скрипт: `python3 src/list_groups.py --tg-secret-id $TF_VAR_TG_SECRET_ID`
 2. Определяем `TF_VAR_DIALOG_IDS` - id чатов, с которых можно собирать статистику, указанные через запятую: `export TF_VAR_DIALOG_IDS=<CHAT_ID_0>,<CHAT_ID_1>,<CHAT_ID_2>,...`
 
 # Создаем БД в кластере CH (директория clickhouse)
 1. Инициализируем terraform: `terraform init`
 2. Применяем спецификацию: `terraform apply -var "folder_id=<ID фолдера>"` 
-3. Определяем переменные окружения `TF_VAR_CH_HOST`, `TF_VAR_CH_USER_NAME`, `TF_VAR_CH_DB_NAME`, `TF_VAR_CH_PASSWORD`
+3. Определяем переменные окружения `TF_VAR_CH_HOST`, `TF_VAR_CH_USER_NAME`, `TF_VAR_CH_DB_NAME`
 4. Создаём нужные таблицы: `./create_tables.sh`
 5. Проверяем, что таблицы создались: `./select_message_count.sh` - должен вывестись `0`, как количество записей в таблице сообщений
 
