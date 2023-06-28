@@ -18,7 +18,7 @@ paths:
         action: SendMessage
         queue_url: ${yandex_message_queue.push-ymq.id}
         folder_id: ${var.folder_id}
-        service_account_id: ${yandex_iam_service_account.ymq-sa.id}
+        service_account_id: ${yandex_iam_service_account.folder-editor.id}
 components:
   securitySchemes:
     ApiKeyAuth:

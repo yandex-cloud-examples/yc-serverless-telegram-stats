@@ -21,11 +21,11 @@ flag_parser.add_argument("--title-filter", type=str)
 
 async def list_groups() -> None:
     args = flag_parser.parse_args()
-    iam_token = os.getenv('YC_TOKEN')
-    if not iam_token:
-        iam_token = getpass.getpass('YC_TOKEN: ')
+    yc_token = os.getenv('YC_TOKEN')
+    if not yc_token:
+        yc_token = getpass.getpass('YC_TOKEN: ')
 
-    yc_sdk = yandexcloud.SDK(iam_token=iam_token)
+    yc_sdk = yandexcloud.SDK(token=yc_token)
 
     lb_client: PayloadServiceStub = yc_sdk.client(PayloadServiceStub)
     secret: Payload = lb_client.Get(GetPayloadRequest(

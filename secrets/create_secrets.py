@@ -1,5 +1,4 @@
 import argparse
-import os
 import random
 import string
 
@@ -9,6 +8,7 @@ from yandex.cloud.lockbox.v1.secret_service_pb2 import CreateSecretRequest, Payl
 from yandex.cloud.lockbox.v1.secret_service_pb2_grpc import SecretServiceStub
 
 from get_session import get_session
+from util import getenv_or_error
 
 ALPHABET = string.ascii_letters + string.digits
 
@@ -56,23 +56,16 @@ def add_session_to_secret(yc_sdk, secret_id, session):
     yc_sdk.wait_operation_and_get_result(update_secret_op)
 
 
-def _getenv_or_error(name):
-    value = os.getenv(name)
-    if not value:
-        raise ValueError(f'env var {name} must be defined')
-    return value
-
-
 def main():
     flag_parser = argparse.ArgumentParser()
     flag_parser.add_argument("--yc-folder-id", type=str, required=True)
     args = flag_parser.parse_args()
 
-    iam_token = _getenv_or_error('YC_TOKEN')
-    tg_api_id = _getenv_or_error('TG_API_ID')
-    tg_api_hash = _getenv_or_error('TG_API_HASH')
+    yc_token = getenv_or_error('YC_TOKEN')
+    tg_api_id = getenv_or_error('TG_API_ID')
+    tg_api_hash = getenv_or_error('TG_API_HASH')
 
-    yc_sdk = yandexcloud.SDK(iam_token=iam_token)
+    yc_sdk = yandexcloud.SDK(token=yc_token)
     session = get_session(tg_api_id, tg_api_hash)
     tg_secret_id = create_tg_secret(yc_sdk, args.yc_folder_id, tg_api_id, tg_api_hash, session)
     ch_secret_id = create_ch_secret(yc_sdk, args.yc_folder_id)
